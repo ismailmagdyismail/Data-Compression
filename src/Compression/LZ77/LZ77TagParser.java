@@ -4,28 +4,24 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 class LZ77TagParser {
-    private static final int TAG_SIZE = 3;
+    private static final int LZ77_TAG_SIZE = 3;
     static ArrayList<LZ77Tag> parse(String compressedData){
         ArrayList<LZ77Tag>tags = new ArrayList<>();
         Stack<String>stack = new Stack<>();
-        String lastEntry = "";
+        String tagEntry = "";
         for(int i = 0 ;i<compressedData.length();i++){
-            if(!Character.isLetterOrDigit(compressedData.charAt(i))){
-                continue;
-            }
-            if (compressedData.charAt(i) == '>' || stack.size() == TAG_SIZE){
-                stack.push(lastEntry);
-                lastEntry = "";
+            if (compressedData.charAt(i) == '>' || stack.size() == LZ77_TAG_SIZE){
+                stack.push(tagEntry);
+                tagEntry = "";
                 String letter = stack.pop();
                 String length = stack.pop();
                 String offset = stack.pop();
                 tags.add(new LZ77Tag(Integer.parseInt(offset),Integer.parseInt(length),letter.charAt(0)));
-                System.out.println("tags"+tags.get(tags.size()-1));
-            }else if(compressedData.charAt(i) == ','){
-                stack.push(lastEntry);
-                lastEntry = "";
-            }else if (compressedData.charAt(i) != '<'){
-                lastEntry += compressedData.charAt(i);
+            }else if(compressedData.charAt(i) == ',' && !tagEntry.isEmpty()){
+                stack.push(tagEntry);
+                tagEntry = "";
+            }else  if(Character.isLetterOrDigit(compressedData.charAt(i)) || compressedData.charAt(i) == '-'){
+                tagEntry += compressedData.charAt(i);
             }
         }
         return tags;
