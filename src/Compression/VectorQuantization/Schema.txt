@@ -1,0 +1,8 @@
+schema:
+image width -> short
+image height -> short
+code book size -> byte
+vector width -> byte
+vector height -> byte
+// each next (vector size) input is code book vector mapped to indices (0, code book size) (# of this values is vector width * height) -> bytes
+// after this next input is code book indices in the image (# of the vectors in the image)

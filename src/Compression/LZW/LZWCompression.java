@@ -27,8 +27,16 @@ public class LZWCompression implements ICompression {
             int encodedIndex = dictionary.get(currentSequence);
             tags.add(new LZWTag(encodedIndex));
         }
+//        String stringTags = "";
+//        for (LZWTag tag : tags) {
+////            stringTags += Character.toString((char) tag.index);
+//            stringTags += "<";
+//            stringTags += Integer.toString(tag.index);
+//            stringTags += ">";
+//        }
         return tags.toString();
     }
+
     @Override
     public String decompress(String data) {
         ArrayList<LZWTag>tags = LZWParser.parse(data);
@@ -36,38 +44,35 @@ public class LZWCompression implements ICompression {
         String decompressedString =  "";
         String last ="";
         for(int i = 0 ;i<tags.size();i++){
-            String repeatingSequence = dictionary.get(tags.get(i).index);
-            decompressedString += repeatingSequence;
-            if(i != 0){
-                dictionary.put(dictionary.size()+1,last+repeatingSequence.charAt(0));
+            String repeatingSequence = "";
+            if(dictionary.get(tags.get(i).index) == null){
+                repeatingSequence = last + last.charAt(0);
+                dictionary.put(dictionary.size()+1,repeatingSequence);
             }
+            else{
+                repeatingSequence = dictionary.get(tags.get(i).index);
+                if(i != 0){
+                    dictionary.put(dictionary.size()+1,last+repeatingSequence.charAt(0));
+                }
+            }
+            decompressedString += repeatingSequence;
             last = repeatingSequence;
         }
         return decompressedString;
     }
+    
     private Map<String,Integer>createCompressionDictionary(){
         Map<String,Integer>dictionary = new HashMap<>();
-        int index = 0 ;
-        for(char i = 'a';i<='z';i++){
-            index++;
-            dictionary.put(String.valueOf(i),index);
-        }
-        for(char i = 'A';i<='Z';i++){
-            index++;
-            dictionary.put(String.valueOf(i),index);
+        for(int i = 1;i<=127;i++){
+            dictionary.put(String.valueOf((char) i),i);
         }
         return dictionary;
     }
+
     private Map<Integer,String>createDecompressionDictionary(){
         Map<Integer,String>dictionary = new HashMap<>();
-        int index = 0 ;
-        for(char i = 'a';i<='z';i++){
-            index++;
-            dictionary.put(index,String.valueOf(i));
-        }
-        for(char i = 'A';i<='Z';i++){
-            index++;
-            dictionary.put(index,String.valueOf(i));
+        for(int i = 1;i<=127;i++){
+            dictionary.put(i+1,String.valueOf((char) i));
         }
         return dictionary;
     }

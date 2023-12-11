@@ -5,51 +5,64 @@ import Compression.ICompression;
 import java.util.ArrayList;
 
 public class LZ77Compression implements ICompression {
+    @Override
+    public String compress(String data) {
+        ArrayList<LZ77Tag> compressedData = new ArrayList<LZ77Tag>();
+        String window = "", current = "";
 
+        for (int i = 0; i < data.length(); i++){
+            current += data.charAt(i);
+            if(window.lastIndexOf(current) == -1){
+                addTag(compressedData, current, window);
+                window += current;
+                current = "";
+            }
+        }
+        if(!current.isEmpty()){
+            addTag(compressedData, current, window);
+        }
+        return compressedData.toString();
+    }
     @Override
     public String decompress(String data){
         ArrayList<LZ77Tag> tags = LZ77TagParser.parse(data);
         String decompressedData = "";
-        for(int i = 0 ;i<tags.size();i++){
-            int start = decompressedData.length() - tags.get(i).offset;
-            int end = start + tags.get(i).length;
-            decompressedData += decompressedData.substring(start,end);
-            if(Character.isLetterOrDigit(tags.get(i).next)){
-                decompressedData += tags.get(i).next;
+        for (LZ77Tag tag : tags) {
+            int start = decompressedData.length() - tag.offset;
+            int end = start + tag.length;
+            decompressedData += decompressedData.substring(start, end);
+            if(tag.next.equals("\\n")){
+                decompressedData += "\n";
+            }
+            else if (!tag.next.equals("ً")) {
+                decompressedData += tag.next;
             }
         }
+
         return decompressedData;
     }
-    @Override
-    public String compress(String data) {
-        ArrayList<LZ77Tag> compressedTags = new ArrayList<>();
-        for(int i = 0 ;i<data.length()-1;){
-            LZ77Tag tag = new LZ77Tag(0,0,data.charAt(i));
-            for(int j = 0; j < i; j++){
-                String currentMatch = findMatchingSubString(j,i,i,data);
-                int len = currentMatch.length();
-                if(!currentMatch.isEmpty()){
-                    tag = maxTag(tag,i-j,currentMatch.length(),i+len < data.length() ? data.charAt(i+len):'-');
-                }
-            }
-            compressedTags.add(tag);
-            i = i + tag.length + 1;
+    private static void addTag(ArrayList<LZ77Tag> compressedData, String current, String window){
+        int length = current.length() - 1;
+        String next = String.valueOf(current.charAt(current.length() - 1));
+        String matchString = current.substring(0, current.length() - 1);
+        int lastIndexSearch = window.lastIndexOf(matchString);
+        int position = window.length() - lastIndexSearch;
+
+        // if all chars at the current found at the window that's mean the loop has been terminated and there is remaining chars
+        if(window.lastIndexOf(current) != -1){
+            next = "ً";
+            length += 1;
+            position = window.length() - window.lastIndexOf(current);
         }
-        return compressedTags.toString();
-    }
-    private String findMatchingSubString(int l , int r,int searchBufferSize,String data){
-        String currentMatch = "";
-        while (l < searchBufferSize && r < data.length() && data.charAt(l) == data.charAt(r)){
-            currentMatch += data.charAt(l);
-            l++;
-            r++;
+
+        // first appear to char
+        else if(current.length() == 1) {
+            position = 0;
         }
-        return currentMatch;
-    }
-    private LZ77Tag maxTag(LZ77Tag oldTag,int newOffset,int newLength,char next){
-        if(newLength >= oldTag.length){
-            return new LZ77Tag(newOffset,newLength,next);
+
+        if(next.equals("\n") ){
+            next = "\\n";
         }
-        return oldTag;
+        compressedData.add(new LZ77Tag(position, length, next));
     }
 }

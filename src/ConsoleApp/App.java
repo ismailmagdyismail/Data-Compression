@@ -1,7 +1,8 @@
+package ConsoleApp;
+
 import Compression.Factory.CompressionFactory;
 import Compression.ICompression;
-import Printer.ConsolePrinter;
-import Printer.IPrinter;
+import IO.*;
 
 import java.io.IOException;
 import java.util.Scanner;
@@ -9,35 +10,35 @@ import java.util.Scanner;
 public class App {
     private static int COMPRESSION_CHOICE = 1;
     private static int DECOMPRESSION_CHOICE = 2;
-    private static Scanner scanner = new Scanner(System.in);
+    public static Scanner scanner = new Scanner(System.in);
     private static final CompressionFactory compressionFactoryInstance = CompressionFactory.getCompressionFactoryInstance();
     private static final String[] algorithmsList = compressionFactoryInstance.getAvailableCompressionAlgorithms();
-    private static final IPrinter printer = new ConsolePrinter();
+//    private static final IO iO = new FileIO(getReadFilePath(), getWriteFilePath());
+    private static final IO iO = new FileIO("F:\\read.txt", "F:\\write.txt");
 
-    public static void run() throws IOException {
+    public void run() throws IOException {
         while (true){
             final int algorithmChoice = AlgorithmListView();
             final String algorithmName = algorithmsList[algorithmChoice-1];
             final ICompression compressionAlgorithm = compressionFactoryInstance.createCompression(algorithmName);
             if(compressionAlgorithm == null){
                 System.out.println("wrong input,Algorithm doesn't exist. Terminating program");
-                continue;
+                break;
             }
+            final String data = iO.readData();
 
-            // TODO Refactor to switch or mapping
             final int compressionChoice = CompressionListView();
             if (compressionChoice == COMPRESSION_CHOICE) {
-                final String data = compressView();
-                final String compressedWord = compressionAlgorithm.compress(data );
+                final String compressedWord = compressionAlgorithm.compress(data);
                 System.out.println("Compressed successfully.");
-                printer.print(compressedWord);
+                iO.print(compressedWord);
             }else if (compressionChoice == DECOMPRESSION_CHOICE) {
-                final String compressedData =  decompressView();
-                final String decompressedData = compressionAlgorithm.decompress(compressedData);
+                final String decompressedData = compressionAlgorithm.decompress(data);
                 System.out.println("Decompressed successfully.");
-                printer.print(decompressedData);
+                iO.print(decompressedData);
             }else{
                 System.out.println("wrong input program has been terminated");
+                break;
             }
         }
     }
@@ -56,14 +57,13 @@ public class App {
         System.out.print(">> ");
         return scanner.nextInt();
     }
-    private static String compressView(){
-        System.out.print("please enter string: ");
-        scanner.nextLine();
+    private static String getWriteFilePath(){
+        System.out.print("please enter the file path that you want to write the data in: ");
         return scanner.nextLine();
     }
-    private static String decompressView(){
-        System.out.print("please enter compressed tags/String: ");
-        scanner.nextLine();
+
+    private static String getReadFilePath(){
+        System.out.print("please enter the file path that you want to read the data from: ");
         return scanner.nextLine();
     }
 }

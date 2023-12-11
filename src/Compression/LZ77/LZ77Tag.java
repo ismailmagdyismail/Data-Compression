@@ -1,7 +1,7 @@
 package Compression.LZ77;
 
 class LZ77Tag {
-    public LZ77Tag(int position, int length, char next){
+    public LZ77Tag(int position, int length, String next){
         this.offset = position;
         this.length = length;
         this.next = next;
@@ -12,5 +12,5 @@ class LZ77Tag {
         return "<"+ offset +","+length+","+next+">";
     }
     public int offset, length;
-    public char next;
+    public String next;
 }

@@ -1,20 +1,20 @@
 package Compression.LZW;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 class LZWParser {
     static ArrayList<LZWTag> parse(String compressedTags){
-        /// remove []
-        compressedTags = compressedTags.substring(0,compressedTags.length()-1);
-        compressedTags = compressedTags.substring(1);
-        /// remove ,
-        String[]filteredString = compressedTags.split(",");
-        /// remove <>
         ArrayList<LZWTag> tags = new ArrayList<>();
-        System.out.println(filteredString);
-        for (int i = 0 ;i<filteredString.length;i++){
-            filteredString[i] = filteredString[i].substring(1,filteredString[i].length()-1);
-            tags.add(new LZWTag(Integer.parseInt(filteredString[i])));
+        String[] filteredTags = compressedTags.substring(1,compressedTags.length()-1).split(",");
+        for (int i = 0 ;i<filteredTags.length;i++){
+            int start = 1 ;
+            if(filteredTags[i].charAt(0) == ' '){
+                start = 2;
+            }
+            int index = Integer.parseInt(filteredTags[i].substring(start,filteredTags[i].length()-1));
+            tags.add(new LZWTag(index));
         }
         return tags;
     }
