@@ -5,3 +5,4 @@
 - LZW (Text)
 - Standard Hauffman (Text)
 - Vector Quantization (Images)
+- 2D predictive Encoding
