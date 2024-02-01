@@ -1,21 +1,42 @@
-package Compression.VectorQuantization;
-
+package Compression.ImagesPredictiveEncoding.RW;
+import Compression.ImagesPredictiveEncoding.ImagePredictiveDecompressionParser;
+import Compression.VectorQuantization.VectorQuantizationParser;
 import IO.FileIO;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
-public class VectorQuantizationDecompressionRW extends FileIO {
-    public VectorQuantizationDecompressionRW(String readFilePath, String writeFilePath) {
+public class ImagePredictiveDecompressionRW extends FileIO {
+    public ImagePredictiveDecompressionRW(String readFilePath, String writeFilePath) {
         super(readFilePath, writeFilePath);
+    }
+
+    @Override
+    public String readData(){
+        String data = "";
+        try {
+            FileInputStream fileInputStream = new FileInputStream(readFilePath);
+            DataInputStream dataInputStream = new DataInputStream(fileInputStream);
+            data += dataInputStream.readShort() + "\n";
+            data += dataInputStream.readShort() + "\n";
+            while (dataInputStream.available() > 0){
+                data += dataInputStream.readShort() + "\n";
+            }
+            dataInputStream.close();
+            fileInputStream.close();
+        } catch (IOException e) {}
+        System.out.println(data);
+        return data;
     }
 
     @Override
     public void print(String data) {
         String[] rows = data.split("\n");
-
-        int[][] greyMatrix = new int[VectorQuantizationParser.getImageHeight(data)][VectorQuantizationParser.getImageWidth(data)];
+        int[][] greyMatrix = new int[ImagePredictiveDecompressionParser.parseHeight(data)][ImagePredictiveDecompressionParser.parseHeight(data)];
         for(int i = 0; i < rows.length; i++){
             String[] col = rows[i].split(" ");
             for(int j = 0; j < col.length; j++){
@@ -25,22 +46,6 @@ public class VectorQuantizationDecompressionRW extends FileIO {
         writeGrayscaleImage(greyMatrix, writeFilePath);
     }
 
-    @Override
-    public String readData() {
-        String data = "";
-        try {
-            FileInputStream fileInputStream = new FileInputStream(readFilePath);
-            DataInputStream dataInputStream = new DataInputStream(fileInputStream);
-            data += dataInputStream.readShort() + "\n";
-            data += dataInputStream.readShort() + "\n";
-            while (dataInputStream.available() > 0){
-                data += dataInputStream.readUnsignedByte() + "\n";
-            }
-            dataInputStream.close();
-            fileInputStream.close();
-        } catch (IOException e) {}
-        return data;
-    }
 
     private static void writeGrayscaleImage(int[][] greyMatrix, String outputPath) {
         int height = greyMatrix.length;

@@ -1,6 +1,7 @@
 package Compression.Factory;
 
 import Compression.ICompression;
+import Compression.ImagesPredictiveEncoding.ImagePredictiveCompression;
 import Compression.LZ77.LZ77Compression;
 import Compression.LZW.LZWCompression;
 import Compression.StanderdHuffman.StandardHuffmanCompression;
@@ -26,6 +27,7 @@ public class CompressionFactory {
         algorithmMapper.put("lzw",new LZWCompression());
         algorithmMapper.put("standard huffman",new StandardHuffmanCompression());
         algorithmMapper.put("vector quantization",new VectorQuantizationCompression());
+        algorithmMapper.put("image predictive encoding",new ImagePredictiveCompression());
     }
     public ICompression createCompression(String algorithmName){
         return algorithmMapper.get(algorithmName);

@@ -1,0 +1,5 @@
+image Width -> unSigned Short
+image Height -> unSigned Short
+next Height * Width inputs -> Bytes
+first row from the original image, first col from the original image,
+otherwise is the de quantized matrix image

@@ -7,18 +7,22 @@ import java.util.Arrays;
 import java.util.Vector;
 
 public class VectorQuantizationCompression implements ICompression {
-    private final int codeBookSize = 4;     // 2^n only numbers
+    private final int codeBookSize = 32;     // 2^n only numbers
     private final int vectorHeight = 2;
     private final int vectorWidth = 2;
     @Override
     public String compress(String data) {
         Vector<Vector<Double>> extractedVectors = VectorQuantizationParser.extractVectorsFromData(data, vectorHeight, vectorWidth);
+        // root vector to start splitting
         Vector<Double> avgVector = getAvgVector(extractedVectors);
+        // create code book
         Vector<Vector<Double>> codeBook = createCodeBook(extractedVectors, avgVector);
+        // map each vector to it's near code book vector by indices
         Vector<Vector<Double>>[] indexedVectors = getIndexedVectors(extractedVectors, codeBook);
 
         int[] compressedImage = new int[extractedVectors.size()];
-
+        // search at each index of indexed vector to find the current vector at image vectors and if it found
+        // that means it has this current index
         for(int i = 0; i < extractedVectors.size(); i++){
             int vectorIndex = -1;
             boolean found = false;
@@ -37,6 +41,7 @@ public class VectorQuantizationCompression implements ICompression {
             compressedImage[i] = vectorIndex;
         }
 
+        // create saving schema
         String compressedData = "";
         compressedData += VectorQuantizationParser.getImageWidth(data) + "\n";
         compressedData += VectorQuantizationParser.getImageHeight(data) + "\n";

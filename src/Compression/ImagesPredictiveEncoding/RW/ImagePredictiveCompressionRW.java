@@ -1,26 +1,27 @@
-package Compression.VectorQuantization;
+package Compression.ImagesPredictiveEncoding.RW;
 
 import IO.FileIO;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.*;
-import java.util.Arrays;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
-public class VectorQuantizationCompressionRW extends FileIO {
-    public VectorQuantizationCompressionRW(String readFilePath, String writeFilePath) {
+public class ImagePredictiveCompressionRW extends FileIO {
+    public ImagePredictiveCompressionRW(String readFilePath, String writeFilePath) {
         super(readFilePath, writeFilePath);
     }
 
     @Override
     public String readData() {
         int[][] greyMatrix = readGrayscaleImage(readFilePath);
-
         if (greyMatrix != null) {
             String data = "";
-            for(int i = 0; i < greyMatrix.length; i++){
-                for(int j = 0; j < greyMatrix[i].length; j++){
-                    data += greyMatrix[i][j] + " ";
+            for (int[] matrix : greyMatrix) {
+                for (int i : matrix) {
+                    data += i + " ";
                 }
                 data += "\n";
             }
@@ -75,7 +76,7 @@ public class VectorQuantizationCompressionRW extends FileIO {
             dataOutputStream.writeShort(Integer.parseInt(splittedData[1]));
 
             for(int i = 2; i < splittedData.length; i++){
-                dataOutputStream.writeByte(Integer.parseInt(splittedData[i]));
+                dataOutputStream.writeShort(Integer.parseInt(splittedData[i]));
             }
             dataOutputStream.flush();
             dataOutputStream.close();

@@ -28,6 +28,10 @@ public class GUI extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
         initializeAlgorithmSelector(algorithmSelector);
+
+        writeFilePath.setText("F:\\write.bin"); // TODO delete me
+        readFilePath.setText("F:\\elephant.bmp"); // TODO delete me
+
         writeFilePathBrowseBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

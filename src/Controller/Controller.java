@@ -1,6 +1,9 @@
 package Controller;
 import Compression.Factory.CompressionFactory;
 import Compression.ICompression;
+import Compression.ImagesPredictiveEncoding.ImagePredictiveCompression;
+import Compression.ImagesPredictiveEncoding.RW.ImagePredictiveCompressionRW;
+import Compression.ImagesPredictiveEncoding.RW.ImagePredictiveDecompressionRW;
 import Compression.VectorQuantization.VectorQuantizationCompression;
 import Compression.VectorQuantization.VectorQuantizationCompressionRW;
 import Compression.VectorQuantization.VectorQuantizationDecompressionRW;
@@ -31,6 +34,9 @@ public class Controller {
         if(compressionAlgorithm instanceof VectorQuantizationCompression){
             fileIO = new VectorQuantizationCompressionRW(gui.getReadFilePath(), gui.getWriteFilePath());
         }
+        else if(compressionAlgorithm instanceof ImagePredictiveCompression){
+            fileIO = new ImagePredictiveCompressionRW(gui.getReadFilePath(), gui.getWriteFilePath());
+        }
 
         String data = fileIO.readData();
         String compressedData = compressionAlgorithm.compress(data);
@@ -43,6 +49,9 @@ public class Controller {
         // vector quantization customized R, W
         if(compressionAlgorithm instanceof VectorQuantizationCompression){
             fileIO = new VectorQuantizationDecompressionRW(gui.getReadFilePath(), gui.getWriteFilePath());
+        }
+        else if(compressionAlgorithm instanceof ImagePredictiveCompression){
+            fileIO = new ImagePredictiveDecompressionRW(gui.getReadFilePath(), gui.getWriteFilePath());
         }
 
         String data = fileIO.readData();
